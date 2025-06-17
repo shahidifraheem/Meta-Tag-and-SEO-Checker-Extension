@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Meta Tag & SEO Checker Pro</title>
+    <link rel="stylesheet" href="css/popup.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>SEO Analysis</h1>
+
+        <div class="toolbar">
+            <button id="export-btn">Export Report</button>
+            <select id="export-format">
+                <option value="json">JSON</option>
+                <option value="csv">CSV</option>
+                <option value="pdf">PDF</option>
+            </select>
+        </div>
+
+        <div id="seo-score" class="score-container">
+            <div class="score-circle">0</div>
+            <span>SEO Score</span>
+            <div class="history-toggle" id="history-toggle">Show History</div>
+        </div>
+
+        <div id="history-container" class="history-container hidden">
+            <canvas id="history-chart"></canvas>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="meta-tags">Meta Tags</button>
+            <button class="tab-btn" data-tab="recommendations">Recommendations</button>
+            <button class="tab-btn" data-tab="social-preview">Social Preview</button>
+        </div>
+
+        <div class="tab-content active" id="meta-tabs">
+            <div id="meta-tags" class="tag-container"></div>
+        </div>
+
+        <div class="tab-content" id="recommendations">
+            <div id="recommendations-list" class="recommendations-container"></div>
+        </div>
+
+        <div class="tab-content" id="social-preview">
+            <div class="social-preview-container">
+                <h3>Facebook Preview</h3>
+                <div class="social-preview facebook">
+                    <div class="social-image" id="facebook-image"></div>
+                    <div class="social-content">
+                        <div class="social-url" id="facebook-url">example.com</div>
+                        <div class="social-title" id="facebook-title">Page Title</div>
+                        <div class="social-description" id="facebook-description">Page description that shows in social
+                            media previews...</div>
+                    </div>
+                </div>
+
+                <h3>Twitter Preview</h3>
+                <div class="social-preview twitter">
+                    <div class="social-image" id="twitter-image"></div>
+                    <div class="social-content">
+                        <div class="social-url" id="twitter-url">example.com</div>
+                        <div class="social-title" id="twitter-title">Page Title</div>
+                        <div class="social-description" id="twitter-description">Page description that shows in social
+                            media previews...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button id="analyze-btn">Re-analyze Page</button>
+    </div>
+
+    <script src="libs/FileSaver.min.js"></script>
+    <script src="libs/jspdf.min.js"></script>
+    <script src="libs/chart.js"></script>
+    <script src="js/popup.js"></script>
+</body>
+
+</html>
