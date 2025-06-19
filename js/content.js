@@ -51,7 +51,7 @@ function analyzePage() {
 
     // Description check
     const descriptionTag = metaTags.find(tag => tag.name === 'description');
-    if (descriptionTag) {
+    if (hasDescription) {
         const descLength = descriptionTag.content.length;
         if (descLength >= 70 && descLength <= 160) {
             score += 20;

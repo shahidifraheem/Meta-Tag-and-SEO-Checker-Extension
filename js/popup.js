@@ -249,37 +249,55 @@ document.addEventListener('DOMContentLoaded', function () {
             creator: 'Meta Tag & SEO Checker'
         });
 
-        // Title
+        // ===== HEADER WITH SPACING =====
+        // Header background (full width, 20mm height)
+        doc.setFillColor(66, 133, 244); // Google blue
+        doc.rect(0, 0, doc.internal.pageSize.width, 20, 'F');
+
+        // Header text
         doc.setFontSize(20);
-        doc.setTextColor(40, 40, 40);
-        doc.text('SEO Analysis Report', 105, 15, { align: 'center' });
+        doc.setTextColor(255, 255, 255); // White text
+        doc.setFont(undefined, 'bold'); // Set bold font
+        doc.text('Meta Tag & SEO Checker', 105, 12, { align: 'center' });
+        doc.setFont(undefined, 'normal');   // Switch back to normal font
+
+        // Main title
+        doc.setFontSize(20);
+        doc.setTextColor(40, 40, 40); // Dark gray
+        doc.setFont(undefined, 'bold'); // Set bold font
+        doc.text('SEO Analysis Report', 105, 35, { align: 'center' });
+        doc.setFont(undefined, 'normal');   // Switch back to normal font
 
         // Score with colored circle
-        doc.setFontSize(16);
-        doc.text('SEO Score:', 14, 30);
+        doc.setFontSize(15);
+        doc.setFont(undefined, 'bold'); // Set bold font
+        doc.text('SEO Score:', 14, 45);
+        doc.setFont(undefined, 'normal');   // Switch back to normal font
 
         // Draw score circle
         const scoreColor = getPDFScoreColor(data.score);
         doc.setFillColor(scoreColor.r, scoreColor.g, scoreColor.b);
-        doc.circle(45, 25, 8, 'F');
+        doc.circle(50, 43, 6, 'F');
 
         // Add score text
         doc.setTextColor(255, 255, 255);
-        doc.text(data.score.toString(), 45, 29, { align: 'center' });
-        doc.setTextColor(0, 0, 0);
-        doc.text(data.score.toString(), 60, 30);
+        doc.setFont(undefined, 'bold'); // Set bold font
+        doc.text(data.score.toString(), 50, 45, { align: 'center' });
+        doc.setFont(undefined, 'normal');   // Switch back to normal font
 
         // Add analysis date
         doc.setFontSize(10);
         doc.setTextColor(100, 100, 100);
-        doc.text('Analyzed on: ' + new Date().toLocaleDateString(), 14, 40);
+        doc.text('Analyzed on: ' + new Date().toLocaleDateString(), 14, 55);
 
         // Meta tags section
         doc.setFontSize(14);
         doc.setTextColor(40, 40, 40);
-        doc.text('Meta Tags:', 14, 50);
+        doc.setFont(undefined, 'bold'); // Set bold font
+        doc.text('Meta Tags:', 14, 62);
+        doc.setFont(undefined, 'normal');   // Switch back to normal font
 
-        let y = 55;
+        let y = 70;
         doc.setFontSize(10);
         data.metaTags.forEach(tag => {
             if (y > 270) {
@@ -289,16 +307,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const name = tag.name || tag.property || 'charset';
             const value = tag.content || tag.charset || '';
-            doc.text(`${name}: ${value.substring(0, 100)}${value.length > 100 ? '...' : ''}`, 20, y);
+            doc.text(`${name}: ${value.substring(0, 85)}${value.length > 85 ? '...' : ''}`, 20, y);
             y += 7;
         });
 
         // Recommendations section
         doc.addPage();
         doc.setFontSize(14);
+        doc.setFont(undefined, 'bold'); // Set bold font
         doc.text('Recommendations:', 14, 20);
+        doc.setFont(undefined, 'normal');   // Switch back to normal font
 
-        y = 25;
+        y = 28;
         data.recommendations.forEach(rec => {
             if (y > 270) {
                 doc.addPage();
@@ -311,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const color = getRecommendationColor(rec.status);
             doc.setTextColor(color.r, color.g, color.b);
 
-            doc.text(`• ${rec.message}`, 20, y);
+            doc.text(`- ${rec.message}`, 20, y);
             y += 7;
         });
 
