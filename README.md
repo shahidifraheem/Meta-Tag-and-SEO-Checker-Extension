@@ -32,4 +32,4 @@ A comprehensive Chrome extension for analyzing meta tags and SEO elements on any
 
 ## Privacy Policy
 
-This extension stores all data locally in your browser. No information is sent to external servers. See the full [Privacy Policy](privacy-policy.html).
+This extension stores all data locally in your browser. No information is sent to external servers. See the full [Privacy Policy](https://shahidifraheem.github.io/Meta-Tag-and-SEO-Checker-Extension/privacy-policy.html).
