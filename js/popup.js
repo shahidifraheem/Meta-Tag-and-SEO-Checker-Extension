@@ -2,9 +2,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const analyzeBtn = document.getElementById('analyze-btn');
     const exportBtn = document.getElementById('export-btn');
     const exportFormat = document.getElementById('export-format');
-    const historyToggle = document.getElementById('history-toggle');
-    const historyContainer = document.getElementById('history-container');
-    let historyChart = null;
     let currentAnalysis = null;
 
     // Tab switching
@@ -22,9 +19,6 @@ document.addEventListener('DOMContentLoaded', function () {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const tab = tabs[0];
         loadAndAnalyze(tab.id);
-
-        // Load history
-        loadHistory(tab.url);
     });
 
     // Re-analyze button
@@ -32,12 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             loadAndAnalyze(tabs[0].id);
         });
-    });
-
-    // History toggle
-    historyToggle.addEventListener('click', function () {
-        historyContainer.classList.toggle('hidden');
-        historyToggle.textContent = historyContainer.classList.contains('hidden') ? 'Show History' : 'Hide History';
     });
 
     // Export button
@@ -70,7 +58,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (message.type === 'SEO_ANALYSIS_RESULT') {
                     currentAnalysis = message.data;
                     displayResults(message.data);
-                    saveToHistory(message.data);
                 }
             });
 
@@ -138,81 +125,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function loadHistory(url) {
-        chrome.storage.local.get(['seoHistory'], function (result) {
-            const history = result.seoHistory || {};
-            const siteHistory = history[url] || [];
-
-            if (siteHistory.length > 0) {
-                renderHistoryChart(siteHistory);
-            } else {
-                historyToggle.style.display = 'none';
-            }
-        });
-    }
-
-    function renderHistoryChart(history) {
-        const ctx = document.getElementById('history-chart').getContext('2d');
-
-        if (historyChart) {
-            historyChart.destroy();
-        }
-
-        historyChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: history.map(item => new Date(item.timestamp).toLocaleDateString()),
-                datasets: [{
-                    label: 'SEO Score',
-                    data: history.map(item => item.score),
-                    borderColor: '#4285f4',
-                    backgroundColor: 'rgba(66, 133, 244, 0.1)',
-                    tension: 0.1,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100
-                    }
-                }
-            }
-        });
-    }
-
-    function saveToHistory(data) {
-        chrome.storage.local.get(['seoHistory'], function (result) {
-            const history = result.seoHistory || {};
-            const url = data.url;
-            const entry = {
-                score: data.score,
-                timestamp: Date.now(),
-                url: url
-            };
-
-            if (!history[url]) {
-                history[url] = [];
-            }
-
-            history[url].push(entry);
-
-            // Keep only last 10 entries per URL
-            if (history[url].length > 10) {
-                history[url] = history[url].slice(-10);
-            }
-
-            chrome.storage.local.set({ seoHistory: history }, function () {
-                loadHistory(url);
-            });
-        });
-    }
-
-    function exportAsJSON(data, filename) {
+    function exportAsJSON(data) {
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        saveAs(blob, `${filename}.json`);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `seo-report-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
     }
 
     function exportAsCSV(data, filename) {
@@ -234,126 +153,37 @@ document.addEventListener('DOMContentLoaded', function () {
         csv += `"SEO Score","${data.score}","Score"\n`;
 
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        saveAs(blob, `${filename}.csv`);
+        const url = URL.createObjectURL(blob);
+
+        // Create invisible download link
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${filename}.csv`;
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
     }
 
-    function exportAsPDF(data, filename) {
-        // Initialize jsPDF properly
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+    function exportAsPDF(data) {
+        const html = `
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        h1 { color: #2c3e50; }
+        .score { font-size: 24px; color: #4CAF50; }
+    </style>
+    <h1>SEO Report for ${data.url}</h1>
+    <div class="score">SEO Score: ${data.score}/100</div>
+    <!-- Add other report content -->
+    `;
 
-        // Set document properties
-        doc.setProperties({
-            title: 'SEO Analysis Report',
-            subject: 'SEO analysis for ' + data.url,
-            creator: 'Meta Tag & SEO Checker'
-        });
-
-        // ===== HEADER WITH SPACING =====
-        // Header background (full width, 20mm height)
-        doc.setFillColor(66, 133, 244); // Google blue
-        doc.rect(0, 0, doc.internal.pageSize.width, 20, 'F');
-
-        // Header text
-        doc.setFontSize(20);
-        doc.setTextColor(255, 255, 255); // White text
-        doc.setFont(undefined, 'bold'); // Set bold font
-        doc.text('Meta Tag & SEO Checker', 105, 12, { align: 'center' });
-        doc.setFont(undefined, 'normal');   // Switch back to normal font
-
-        // Main title
-        doc.setFontSize(20);
-        doc.setTextColor(40, 40, 40); // Dark gray
-        doc.setFont(undefined, 'bold'); // Set bold font
-        doc.text('SEO Analysis Report', 105, 35, { align: 'center' });
-        doc.setFont(undefined, 'normal');   // Switch back to normal font
-
-        // Score with colored circle
-        doc.setFontSize(15);
-        doc.setFont(undefined, 'bold'); // Set bold font
-        doc.text('SEO Score:', 14, 45);
-        doc.setFont(undefined, 'normal');   // Switch back to normal font
-
-        // Draw score circle
-        const scoreColor = getPDFScoreColor(data.score);
-        doc.setFillColor(scoreColor.r, scoreColor.g, scoreColor.b);
-        doc.circle(50, 43, 6, 'F');
-
-        // Add score text
-        doc.setTextColor(255, 255, 255);
-        doc.setFont(undefined, 'bold'); // Set bold font
-        doc.text(data.score.toString(), 50, 45, { align: 'center' });
-        doc.setFont(undefined, 'normal');   // Switch back to normal font
-
-        // Add analysis date
-        doc.setFontSize(10);
-        doc.setTextColor(100, 100, 100);
-        doc.text('Analyzed on: ' + new Date().toLocaleDateString(), 14, 55);
-
-        // Meta tags section
-        doc.setFontSize(14);
-        doc.setTextColor(40, 40, 40);
-        doc.setFont(undefined, 'bold'); // Set bold font
-        doc.text('Meta Tags:', 14, 62);
-        doc.setFont(undefined, 'normal');   // Switch back to normal font
-
-        let y = 70;
-        doc.setFontSize(10);
-        data.metaTags.forEach(tag => {
-            if (y > 270) {
-                doc.addPage();
-                y = 20;
-            }
-
-            const name = tag.name || tag.property || 'charset';
-            const value = tag.content || tag.charset || '';
-            doc.text(`${name}: ${value.substring(0, 85)}${value.length > 85 ? '...' : ''}`, 20, y);
-            y += 7;
-        });
-
-        // Recommendations section
-        doc.addPage();
-        doc.setFontSize(14);
-        doc.setFont(undefined, 'bold'); // Set bold font
-        doc.text('Recommendations:', 14, 20);
-        doc.setFont(undefined, 'normal');   // Switch back to normal font
-
-        y = 28;
-        data.recommendations.forEach(rec => {
-            if (y > 270) {
-                doc.addPage();
-                y = 20;
-            }
-
-            doc.setFontSize(10);
-
-            // Set color based on recommendation status
-            const color = getRecommendationColor(rec.status);
-            doc.setTextColor(color.r, color.g, color.b);
-
-            doc.text(`- ${rec.message}`, 20, y);
-            y += 7;
-        });
-
-        // Save the PDF
-        doc.save(`${filename}.pdf`);
-    }
-
-    // Helper function for PDF color values
-    function getPDFScoreColor(score) {
-        if (score >= 80) return { r: 76, g: 175, b: 80 };   // Green
-        if (score >= 50) return { r: 255, g: 193, b: 7 };   // Amber
-        return { r: 244, g: 67, b: 54 };                   // Red
-    }
-
-    // Helper function for recommendation colors
-    function getRecommendationColor(status) {
-        switch (status) {
-            case 'good': return { r: 46, g: 125, b: 50 };     // Dark green
-            case 'warning': return { r: 255, g: 143, b: 0 };   // Orange
-            case 'bad': return { r: 198, g: 40, b: 40 };      // Red
-            default: return { r: 66, g: 66, b: 66 };          // Dark gray
-        }
+        const win = window.open('', '_blank');
+        win.document.write(html);
+        win.print();
     }
 
     function getScoreColor(score, forPDF = false) {

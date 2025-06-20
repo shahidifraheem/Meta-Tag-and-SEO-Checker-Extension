@@ -2,31 +2,26 @@
 <html>
 
 <head>
-    <title>Meta Tag & SEO Checker Pro</title>
+    <title>Meta Tag & SEO Checker</title>
     <link rel="stylesheet" href="css/popup.css">
 </head>
 
 <body>
     <div class="container">
-        <h1>SEO Analysis</h1>
+        <h1>Meta Tag & SEO Checker</h1>
 
         <div class="toolbar">
-            <button id="export-btn">Export Report</button>
             <select id="export-format">
                 <option value="json">JSON</option>
                 <option value="csv">CSV</option>
                 <option value="pdf">PDF</option>
             </select>
+            <button id="export-btn">Export Report</button>
         </div>
 
         <div id="seo-score" class="score-container">
-            <div class="score-circle">0</div>
             <span>SEO Score</span>
-            <div class="history-toggle" id="history-toggle">Show History</div>
-        </div>
-
-        <div id="history-container" class="history-container hidden">
-            <canvas id="history-chart"></canvas>
+            <div class="score-circle">0</div>
         </div>
 
         <div class="tabs">
@@ -35,8 +30,8 @@
             <button class="tab-btn" data-tab="social-preview">Social Preview</button>
         </div>
 
-        <div class="tab-content active" id="meta-tabs">
-            <div id="meta-tags" class="tag-container"></div>
+        <div class="tab-content active" id="meta-tags">
+            <div class="tag-container"></div>
         </div>
 
         <div class="tab-content" id="recommendations">
@@ -72,9 +67,6 @@
         <button id="analyze-btn">Re-analyze Page</button>
     </div>
 
-    <script src="libs/FileSaver.min.js"></script>
-    <script src="libs/jspdf.min.js"></script>
-    <script src="libs/chart.js"></script>
     <script src="js/popup.js"></script>
 </body>
 
