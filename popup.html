@@ -12,12 +12,14 @@
         <h1>Meta Tag & SEO Checker</h1>
 
         <div class="toolbar">
-            <select id="export-format">
-                <option value="json">JSON</option>
-                <option value="csv">CSV</option>
-                <option value="pdf">PDF</option>
-            </select>
-            <button id="export-btn">Export Report</button>
+            <div class="export-select">
+                <select id="export-format">
+                    <option value="json">JSON</option>
+                    <option value="csv">CSV</option>
+                    <option value="pdf">PDF</option>
+                </select> <sup>PRO</sup>
+            </div>
+            <button id="export-btn">Upgrade to Export Report</button>
         </div>
 
         <div id="seo-score" class="score-container">
@@ -27,7 +29,7 @@
 
         <div class="tabs">
             <button class="tab-btn active" data-tab="meta-tags">Meta Tags</button>
-            <button class="tab-btn" data-tab="recommendations">Recommendations</button>
+            <button class="tab-btn" data-tab="recommendations">Recommendations <sup>PRO</sup></button>
             <button class="tab-btn" data-tab="social-preview">Social Preview</button>
         </div>
 
@@ -36,7 +38,19 @@
         </div>
 
         <div class="tab-content" id="recommendations">
-            <div id="recommendations-list" class="recommendations-container"></div>
+            <div id="recommendations-list" class="recommendations-container">
+                <div class="recommendation warning">Title tag should be 30-60 characters (current: 61)</div>
+                <div class="recommendation good">Description has good length (70-160 characters)</div>
+                <div class="recommendation good">Viewport meta tag present (good for mobile)</div>
+                <div class="recommendation good">Canonical link present (good for SEO)</div>
+                <div class="recommendation good">OpenGraph tags present (good for social sharing)</div>
+                <div class="recommendation warning">Multiple H1 tags (5)</div>
+                <div class="recommendation good">Good image alt text coverage (94%)</div>
+                <div class="recommendation good">Robots meta tag present</div>
+            </div>
+            <button id="upgrade-btn" style="margin-top: 10px;display: block;text-align: center;padding: 15px;">Upgrade
+                to View
+                Recommendations</button>
         </div>
 
         <div class="tab-content" id="social-preview">
@@ -63,9 +77,12 @@
                     </div>
                 </div>
             </div>
+            <button id="analyze-btn">Re-analyze Page</button>
+            <div id="analyze-loader">
+                <img src="icons/icon48.png" alt="Meta Tag & SEO Checker">
+            </div>
         </div>
 
-        <button id="analyze-btn">Re-analyze Page</button>
     </div>
 
     <script src="js/popup.js"></script>

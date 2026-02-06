@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const analyzeBtn = document.getElementById('analyze-btn');
-    const exportBtn = document.getElementById('export-btn');
-    const exportFormat = document.getElementById('export-format');
+    const analyzeLoader = document.getElementById('analyze-loader');
     let currentAnalysis = null;
 
     // Tab switching
@@ -26,26 +25,10 @@ document.addEventListener('DOMContentLoaded', function () {
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             loadAndAnalyze(tabs[0].id);
         });
-    });
-
-    // Export button
-    exportBtn.addEventListener('click', function () {
-        if (!currentAnalysis) return;
-
-        const format = exportFormat.value;
-        const filename = `seo-report-${new Date().toISOString().slice(0, 10)}`;
-
-        switch (format) {
-            case 'json':
-                exportAsJSON(currentAnalysis, filename);
-                break;
-            case 'csv':
-                exportAsCSV(currentAnalysis, filename);
-                break;
-            case 'pdf':
-                exportAsPDF(currentAnalysis, filename);
-                break;
-        }
+        analyzeLoader.classList.add("active");
+        setTimeout(() => {
+            analyzeLoader.classList.remove("active");
+        }, 500);
     });
 
     function loadAndAnalyze(tabId) {
@@ -81,17 +64,6 @@ document.addEventListener('DOMContentLoaded', function () {
             tagElement.className = 'meta-tag';
             tagElement.innerHTML = `<strong>${tag.name || tag.property || 'charset'}:</strong> ${tag.content || tag.charset || ''}`;
             metaTagsContainer.appendChild(tagElement);
-        });
-
-        // Display recommendations
-        const recommendationsContainer = document.getElementById('recommendations-list');
-        recommendationsContainer.innerHTML = '';
-
-        data.recommendations.forEach(rec => {
-            const recElement = document.createElement('div');
-            recElement.className = `recommendation ${rec.status}`;
-            recElement.textContent = rec.message;
-            recommendationsContainer.appendChild(recElement);
         });
 
         // Display social preview
@@ -191,4 +163,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (score >= 50) return forPDF ? [255, 143, 0] : '#FFC107';
         return forPDF ? [198, 40, 40] : '#F44336';
     }
+
+    document.getElementById("export-btn").addEventListener("click", () => {
+        chrome.tabs.create({ url: "https://codersship.com/product/meta-tag-seo-checker" });
+    });
+
+    document.getElementById("upgrade-btn").addEventListener("click", () => {
+        chrome.tabs.create({ url: "https://codersship.com/product/meta-tag-seo-checker" });
+    });
 });
